@@ -1,0 +1,3 @@
+{
+  "conversation": "Maria: Good morning everyone, let's start our weekly planning meeting.\nDavid: I have finished the user authentication module this week.\nSophia: Great work! I am working on the dashboard UI and should be done by Wednesday.\nTom: The database optimization is taking longer than expected.\nMaria: What is the main challenge, Tom?\nTom: Query performance on large datasets.\nDavid: I can help you with indexing strategies.\nSophia: Should we push back the dashboard deadline?\nMaria: Let's reassess on Wednesday. David, please coordinate with Tom on the database work.\nTom: Sounds good, thanks for the help."
+}
