@@ -26,21 +26,6 @@ class GeminiConfig(
         return model
     }
 
-    @Bean
-    fun conversationAnalystSystemInstruction(): Content {
-        return Content.fromParts(
-            Part.fromText("""
-                You are a conversation analyst. Your role is to analyze conversations and extract structured information.
-
-                Always respond with a JSON object containing:
-                - title: A clear, descriptive title for the conversation
-                - participants: Array of all participant names mentioned or speaking
-                - recap: Comprehensive summary of what was discussed, decided, or concluded, not including any system messages
-
-                Extract participant names directly from the conversation text.
-            """.trimIndent())
-        )
-    }
 
 
     @Bean
@@ -69,16 +54,5 @@ class GeminiConfig(
     }
 
 
-    @Bean
-    fun recapConfig(
-        conversationAnalystSystemInstruction: Content,
-        conversationRecapSchema: Schema
-    ): GenerateContentConfig {
-        return GenerateContentConfig.builder()
-            .systemInstruction(conversationAnalystSystemInstruction)
-            .responseMimeType("application/json")
-            .responseSchema(conversationRecapSchema)
-            .build()
-    }
 
 }

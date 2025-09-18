@@ -16,7 +16,11 @@ class RecapController(
     @PostMapping
     suspend fun generateRecap(@Valid @RequestBody request: RecapRequest): ResponseEntity<RecapResponse> {
         return try {
-            val geminiResponse = geminiService.generateRecap(request.prompt)
+            val geminiResponse = geminiService.generateRecap(
+                conversation = request.conversation,
+                days = request.days,
+                style = request.style
+            )
             val response = RecapResponse(
                 title = geminiResponse.title,
                 users = geminiResponse.participants,
