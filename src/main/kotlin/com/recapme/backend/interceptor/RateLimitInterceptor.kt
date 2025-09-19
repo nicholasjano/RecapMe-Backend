@@ -3,16 +3,22 @@ package com.recapme.backend.interceptor
 import com.recapme.backend.service.RateLimitingService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 
 @Component
 class RateLimitInterceptor(
-    private val rateLimitingService: RateLimitingService
+    private val rateLimitingService: RateLimitingService,
+    @Value("\${app.development:false}") private val isDevelopment: Boolean
 ) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        // Skip rate limiting in development mode
+        if (isDevelopment) {
+            return true
+        }
+
         // Only apply rate limiting to recap endpoints
         if (request.requestURI.startsWith("/api/recap")) {
             val clientIp = getClientIpAddress(request)
