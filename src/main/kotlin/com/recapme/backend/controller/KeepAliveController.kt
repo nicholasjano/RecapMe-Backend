@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
 @RestController
-@RequestMapping("/api/keep-alive")
+@RequestMapping("/keep-alive")
 class KeepAliveController {
 
     private val logger = LoggerFactory.getLogger(KeepAliveController::class.java)
