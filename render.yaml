@@ -16,7 +16,7 @@ services:
 
       # Environment Configuration
       - key: DEVELOPMENT
-        value: "false"
+        sync: false
 
       # Google Gemini API Configuration
       - key: GEMINI_API_KEY

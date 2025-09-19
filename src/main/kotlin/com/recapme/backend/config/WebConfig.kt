@@ -27,8 +27,12 @@ class WebConfig(
             val developmentOrigins = listOf("http://localhost:3000", "http://localhost:8080", "http://localhost:5173")
             (configuredOrigins + developmentOrigins).distinct().toTypedArray()
         } else {
-            // In production, only use configured origins
-            configuredOrigins.toTypedArray()
+            // In production, only use configured origins - if empty, block all
+            if (configuredOrigins.isEmpty()) {
+                arrayOf("https://nonexistent-domain.invalid") // Block all origins
+            } else {
+                configuredOrigins.toTypedArray()
+            }
         }
 
         registry.addMapping("/api/**")
