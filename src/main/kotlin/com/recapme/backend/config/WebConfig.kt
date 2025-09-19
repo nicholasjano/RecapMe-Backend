@@ -41,5 +41,21 @@ class WebConfig(
             .allowedHeaders("Content-Type", "Authorization", "X-API-Key")
             .allowCredentials(false)
             .maxAge(3600)
+
+        // Add CORS configuration for health endpoint
+        registry.addMapping("/health")
+            .allowedOrigins("*")
+            .allowedMethods("GET", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(false)
+            .maxAge(3600)
+
+        // Add CORS configuration for keep-alive endpoint
+        registry.addMapping("/keep-alive")
+            .allowedOrigins("*")
+            .allowedMethods("GET", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(false)
+            .maxAge(3600)
     }
 }
