@@ -2,7 +2,7 @@ services:
   - type: web
     name: recapme-backend
     runtime: docker
-    plan: starter
+    plan: free
     region: singapore
     branch: main
     repo: https://github.com/nicholasjano/RecapMe-Backend
@@ -18,13 +18,6 @@ services:
       - key: DEVELOPMENT
         value: "false"
 
-      # Redis Configuration
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: recapme-redis
-          property: connectionString
-
       # Google Gemini API Configuration
       - key: GEMINI_API_KEY
         sync: false
@@ -39,9 +32,6 @@ services:
       - key: CORS_ALLOWED_ORIGINS
         sync: false
 
-  - type: redis
-    name: recapme-redis
-    plan: starter
-    region: singapore
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
+      # Redis Configuration
+      - key: REDIS_URL
+        sync: false
