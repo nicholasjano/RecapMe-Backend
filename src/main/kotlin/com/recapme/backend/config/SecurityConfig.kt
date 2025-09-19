@@ -13,21 +13,34 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    @Value("\${app.api.key}") private val apiKey: String
+    @Value("\${app.api.key:}") private val apiKey: String,
+    @Value("\${app.development:false}") private val isDevelopment: Boolean
 ) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        return http
-            .csrf { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests { auth ->
-                auth
-                    .requestMatchers("/actuator/health/**").permitAll()
-                    .requestMatchers("/api/**").authenticated()
-                    .anyRequest().permitAll()
-            }
-            .addFilterBefore(ApiKeyAuthenticationFilter(apiKey), UsernamePasswordAuthenticationFilter::class.java)
-            .build()
+        return if (isDevelopment) {
+            // Development mode - no authentication required
+            http
+                .csrf { it.disable() }
+                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+                .authorizeHttpRequests { auth ->
+                    auth.anyRequest().permitAll()
+                }
+                .build()
+        } else {
+            // Production mode - API key authentication required
+            http
+                .csrf { it.disable() }
+                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+                .authorizeHttpRequests { auth ->
+                    auth
+                        .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
+                }
+                .addFilterBefore(ApiKeyAuthenticationFilter(apiKey), UsernamePasswordAuthenticationFilter::class.java)
+                .build()
+        }
     }
 }

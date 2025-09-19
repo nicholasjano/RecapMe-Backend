@@ -31,11 +31,15 @@ class RecapController(
         logger.debug("Input validation completed successfully")
 
         return try {
-            val geminiResponse = geminiService.generateRecap(
+            val geminiResponseFuture = geminiService.generateRecap(
                 conversation = sanitizedConversation,
                 days = validatedDays,
                 style = validatedStyle
             )
+
+            // Wait for the CompletableFuture to complete
+            val geminiResponse = geminiResponseFuture.get()
+
             val response = RecapResponse(
                 title = geminiResponse.title,
                 users = geminiResponse.participants,

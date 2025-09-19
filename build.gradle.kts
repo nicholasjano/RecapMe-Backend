@@ -39,6 +39,10 @@ dependencies {
 	// Dotenv for loading .env files
 	implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
+	// Resilience4j for circuit breaker, retry, and timeout
+	implementation("io.github.resilience4j:resilience4j-spring-boot3:2.1.0")
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

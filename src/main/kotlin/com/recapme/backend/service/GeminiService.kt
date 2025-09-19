@@ -7,8 +7,12 @@ import com.google.genai.types.Part
 import com.google.genai.types.Schema
 import com.recapme.backend.model.ConversationRecapResponse
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
+import io.github.resilience4j.retry.annotation.Retry
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter
 import org.springframework.stereotype.Service
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletableFuture
 
 @Service
 class GeminiService(
@@ -19,36 +23,41 @@ class GeminiService(
 ) {
     private val logger = LoggerFactory.getLogger(GeminiService::class.java)
 
-    fun generateRecap(conversation: String, days: Int, style: String): ConversationRecapResponse {
+    @CircuitBreaker(name = "gemini", fallbackMethod = "generateRecapFallback")
+    @Retry(name = "gemini")
+    @TimeLimiter(name = "gemini")
+    fun generateRecap(conversation: String, days: Int, style: String): CompletableFuture<ConversationRecapResponse> {
         logger.info("Starting generateRecap request with days: $days, style: $style")
 
-        return try {
-            val systemInstruction = createSystemInstruction(days, style)
-            val config = GenerateContentConfig.builder()
-                .systemInstruction(systemInstruction)
-                .responseMimeType("application/json")
-                .responseSchema(conversationRecapSchema)
-                .build()
+        return CompletableFuture.supplyAsync {
+            try {
+                val systemInstruction = createSystemInstruction(days, style)
+                val config = GenerateContentConfig.builder()
+                    .systemInstruction(systemInstruction)
+                    .responseMimeType("application/json")
+                    .responseSchema(conversationRecapSchema)
+                    .build()
 
-            logger.info("Making request to Gemini API with model: $model using dynamic system instruction")
+                logger.info("Making request to Gemini API with model: $model using dynamic system instruction")
 
-            val response = client.models.generateContent(
-                model,
-                conversation,
-                config
-            )
+                val response = client.models.generateContent(
+                    model,
+                    conversation,
+                    config
+                )
 
-            val responseText = response.text() ?: ""
-            if (responseText.isBlank()) {
-                throw RuntimeException("No response text from Gemini API")
+                val responseText = response.text() ?: ""
+                if (responseText.isBlank()) {
+                    throw RuntimeException("No response text from Gemini API")
+                }
+
+                logger.info("Received structured JSON response: $responseText")
+
+                objectMapper.readValue(responseText, ConversationRecapResponse::class.java)
+            } catch (e: Exception) {
+                logger.error("Failed to generate recap", e)
+                throw RuntimeException("Failed to generate recap: ${e.message}", e)
             }
-
-            logger.info("Received structured JSON response: $responseText")
-
-            objectMapper.readValue(responseText, ConversationRecapResponse::class.java)
-        } catch (e: Exception) {
-            logger.error("Failed to generate recap", e)
-            throw RuntimeException("Failed to generate recap: ${e.message}", e)
         }
     }
 
@@ -78,6 +87,21 @@ class GeminiService(
         """.trimIndent()
 
         return Content.fromParts(Part.fromText(instruction))
+    }
+
+    // Fallback method for circuit breaker
+    fun generateRecapFallback(conversation: String, days: Int, style: String, ex: Exception): CompletableFuture<ConversationRecapResponse> {
+        logger.warn("Gemini API is unavailable, using fallback response. Reason: ${ex.message}")
+
+        val fallbackResponse = ConversationRecapResponse(
+            title = "Service Temporarily Unavailable",
+            participants = listOf("System"),
+            recap = "We're sorry, but our AI recap service is temporarily unavailable. " +
+                    "This could be due to high demand or maintenance. Please try again in a few minutes. " +
+                    "Your conversation data has been safely processed and no information was lost."
+        )
+
+        return CompletableFuture.completedFuture(fallbackResponse)
     }
 
     fun generateText(prompt: String): String {
