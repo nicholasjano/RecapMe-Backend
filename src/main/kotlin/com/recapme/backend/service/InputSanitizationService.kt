@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service
 class InputSanitizationService {
 
     companion object {
-        private const val MAX_INPUT_LENGTH = 50000
-        private const val MAX_LINES = 1000
+        private const val MAX_INPUT_LENGTH = 4000000 // 4 million characters (conservative limit)
+        private const val MAX_LINES = 50000 // Proportionally set
 
         // Suspicious patterns that might indicate prompt injection attempts
         private val SUSPICIOUS_PATTERNS = listOf(

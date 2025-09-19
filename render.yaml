@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: recapme-backend
+    runtime: docker
+    plan: starter
+    region: singapore
+    branch: main
+    repo: https://github.com/nicholasjano/RecapMe-Backend
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      # Core Configuration
+      - key: PORT
+        value: "10000"
+
+      # Environment Configuration
+      - key: DEVELOPMENT
+        value: "false"
+
+      # Redis Configuration
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: recapme-redis
+          property: connectionString
+
+      # Google Gemini API Configuration
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+
+      # API Security Configuration
+      - key: API_KEY
+        sync: false
+
+      # CORS Configuration
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+
+  - type: redis
+    name: recapme-redis
+    plan: starter
+    region: singapore
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []

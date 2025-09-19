@@ -19,28 +19,15 @@ class SecurityConfig(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        return if (isDevelopment) {
-            // Development mode - no authentication required
-            http
-                .csrf { it.disable() }
-                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-                .authorizeHttpRequests { auth ->
-                    auth.anyRequest().permitAll()
-                }
-                .build()
-        } else {
-            // Production mode - API key authentication required
-            http
-                .csrf { it.disable() }
-                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-                .authorizeHttpRequests { auth ->
-                    auth
-                        .requestMatchers("/actuator/health/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
-                }
-                .addFilterBefore(ApiKeyAuthenticationFilter(apiKey), UsernamePasswordAuthenticationFilter::class.java)
-                .build()
-        }
+        return http
+            .csrf { it.disable() }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers("/actuator/health/**").permitAll()
+                    .anyRequest().permitAll()
+            }
+            .addFilterBefore(ApiKeyAuthenticationFilter(apiKey, isDevelopment), UsernamePasswordAuthenticationFilter::class.java)
+            .build()
     }
 }
