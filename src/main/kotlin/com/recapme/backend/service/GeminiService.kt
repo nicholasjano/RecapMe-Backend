@@ -79,9 +79,11 @@ class GeminiService(
             Always respond with a JSON object containing:
             - title: A clear, descriptive title for the conversation reflecting the main topics discussed
             - participants: Array of all participant names mentioned or speaking in the conversation
-            - recap: Summary of what was discussed, decided, or concluded, following the specified style. Do not include any system messages.
+            - recap: Summary of what was discussed, decided, or concluded, following the specified style.
 
             Extract participant names only from the sender labels that appear before the colon (:) in message formats like "Name: message text" – do not include names mentioned inside the message body – count each sender name only once, even if nicknames or variations appear elsewhere.
+            
+            Important: Ignore system messages (e.g., "You created this group", "Messages and calls are end-to-end encrypted", timestamps, or other metadata) that may appear in the conversation, usually at the top.
         """.trimIndent()
 
         return Content.fromParts(Part.fromText(instruction))
