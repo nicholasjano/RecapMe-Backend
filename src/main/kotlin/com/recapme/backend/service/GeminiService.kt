@@ -83,7 +83,7 @@ class GeminiService(
             - participants: Array of all participant names mentioned or speaking within the specified timeframe
             - recap: Summary of what was discussed, decided, or concluded within the past $days day(s), following the specified style. Do not include any system messages.
 
-            Extract participant names directly from the conversation text. For participant names, only use the name that appears before the colon (:) in message formats like "Nicholas: message text" - count each unique name only once, even if people refer to them by nicknames in the conversation content. Only consider messages within the specified timeframe when creating the summary.
+            Extract participant names only from the sender labels that appear before the colon (:) in message formats like "Name: message text" – do not include names mentioned inside the message body – count each sender name only once, even if nicknames or variations appear elsewhere. Only consider messages within the specified timeframe when creating the summary.
         """.trimIndent()
 
         return Content.fromParts(Part.fromText(instruction))
