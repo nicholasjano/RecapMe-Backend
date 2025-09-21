@@ -88,13 +88,4 @@ class InputSanitizationService {
         return normalizedStyle
     }
 
-    fun validateDays(days: Int): Int {
-        if (days < 1) {
-            throw InvalidInputException("Days must be at least 1")
-        }
-        if (days > 365) {
-            throw InvalidInputException("Days cannot exceed 365")
-        }
-        return days
-    }
 }

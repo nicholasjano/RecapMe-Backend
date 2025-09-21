@@ -26,12 +26,12 @@ class GeminiService(
     @CircuitBreaker(name = "gemini", fallbackMethod = "generateRecapFallback")
     @Retry(name = "gemini")
     @TimeLimiter(name = "gemini")
-    fun generateRecap(conversation: String, days: Int, style: String): CompletableFuture<ConversationRecapResponse> {
-        logger.info("Starting generateRecap request with days: $days, style: $style")
+    fun generateRecap(conversation: String, style: String): CompletableFuture<ConversationRecapResponse> {
+        logger.info("Starting generateRecap request with style: $style")
 
         return CompletableFuture.supplyAsync {
             try {
-                val systemInstruction = createSystemInstruction(days, style)
+                val systemInstruction = createSystemInstruction(style)
                 val config = GenerateContentConfig.builder()
                     .systemInstruction(systemInstruction)
                     .responseMimeType("application/json")
@@ -61,7 +61,7 @@ class GeminiService(
         }
     }
 
-    private fun createSystemInstruction(days: Int, style: String): Content {
+    private fun createSystemInstruction(style: String): Content {
         val styleInstructions = when (style.lowercase()) {
             "concise" -> "Provide a brief, to-the-point summary focusing only on the most important points."
             "detailed" -> "Provide a comprehensive, thorough summary including context, key discussions, and detailed outcomes."
@@ -74,23 +74,21 @@ class GeminiService(
         val instruction = """
             You are a conversation analyst. Your role is to analyze conversations and extract structured information.
 
-            IMPORTANT: Only analyze and include messages from the past $days day(s). Ignore any messages that are older than $days day(s) from the most recent message in the conversation.
-
             Style: $styleInstructions
 
             Always respond with a JSON object containing:
-            - title: A clear, descriptive title for the conversation reflecting the main topics discussed in the specified timeframe
-            - participants: Array of all participant names mentioned or speaking within the specified timeframe
-            - recap: Summary of what was discussed, decided, or concluded within the past $days day(s), following the specified style. Do not include any system messages.
+            - title: A clear, descriptive title for the conversation reflecting the main topics discussed
+            - participants: Array of all participant names mentioned or speaking in the conversation
+            - recap: Summary of what was discussed, decided, or concluded, following the specified style. Do not include any system messages.
 
-            Extract participant names only from the sender labels that appear before the colon (:) in message formats like "Name: message text" – do not include names mentioned inside the message body – count each sender name only once, even if nicknames or variations appear elsewhere. Only consider messages within the specified timeframe when creating the summary.
+            Extract participant names only from the sender labels that appear before the colon (:) in message formats like "Name: message text" – do not include names mentioned inside the message body – count each sender name only once, even if nicknames or variations appear elsewhere.
         """.trimIndent()
 
         return Content.fromParts(Part.fromText(instruction))
     }
 
     // Fallback method for circuit breaker
-    fun generateRecapFallback(conversation: String, days: Int, style: String, ex: Exception): CompletableFuture<ConversationRecapResponse> {
+    fun generateRecapFallback(conversation: String, style: String, ex: Exception): CompletableFuture<ConversationRecapResponse> {
         logger.warn("Gemini API is unavailable, using fallback response. Reason: ${ex.message}")
 
         val fallbackResponse = ConversationRecapResponse(

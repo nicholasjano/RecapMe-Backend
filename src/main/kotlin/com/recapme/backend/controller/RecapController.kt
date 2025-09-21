@@ -21,11 +21,10 @@ class RecapController(
 
     @PostMapping
     suspend fun generateRecap(@Valid @RequestBody request: RecapRequest): ResponseEntity<RecapResponse> {
-        logger.info("Received recap request for {} days with style: {}", request.days, request.style)
+        logger.info("Received recap request with style: {}", request.style)
 
         // Sanitize and validate inputs
         val sanitizedConversation = inputSanitizationService.sanitizeConversationInput(request.conversation)
-        val validatedDays = inputSanitizationService.validateDays(request.days)
         val validatedStyle = inputSanitizationService.validateStyle(request.style)
 
         logger.debug("Input validation completed successfully")
@@ -33,7 +32,6 @@ class RecapController(
         return try {
             val geminiResponseFuture = geminiService.generateRecap(
                 conversation = sanitizedConversation,
-                days = validatedDays,
                 style = validatedStyle
             )
 
