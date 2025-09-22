@@ -27,5 +27,12 @@ echo "Starting RecapMe Backend on port $PORT..."
 echo "Development mode: $DEVELOPMENT"
 echo "Gemini model: $GEMINI_MODEL"
 
-# Start the Spring Boot application
-exec java -Dserver.port=${PORT} -jar app.jar
+# Start the Spring Boot application with optimized JVM settings for Render
+exec java \
+    -Dserver.port=${PORT} \
+    -Dserver.shutdown=immediate \
+    -Dspring.lifecycle.timeout-per-shutdown-phase=10s \
+    -Djava.awt.headless=true \
+    -XX:+UseContainerSupport \
+    -XX:MaxRAMPercentage=75.0 \
+    -jar app.jar
