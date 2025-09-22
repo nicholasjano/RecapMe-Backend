@@ -40,7 +40,7 @@ class RecapController(
 
             val response = RecapResponse(
                 title = geminiResponse.title,
-                users = geminiResponse.participants,
+                participants = geminiResponse.participants,
                 recap = geminiResponse.recap
             )
             logger.info("Successfully generated recap with title: {}", geminiResponse.title)

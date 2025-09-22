@@ -3,12 +3,12 @@ package com.recapme.backend.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class RecapResponse(
-    @JsonProperty("Title")
+    @JsonProperty("title")
     val title: String,
 
-    @JsonProperty("Users")
-    val users: List<String>,
+    @JsonProperty("participants")
+    val participants: List<String>,
 
-    @JsonProperty("Recap")
+    @JsonProperty("recap")
     val recap: String
 )

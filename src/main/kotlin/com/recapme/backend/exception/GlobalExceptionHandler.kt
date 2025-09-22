@@ -19,7 +19,7 @@ class GlobalExceptionHandler {
         val response: Map<String, Any> = mapOf(
             "error" to "Rate limit exceeded",
             "message" to "Too many requests. Please try again later.",
-            "retryAfter" to e.retryAfterSeconds
+            "retry_after" to e.retryAfterSeconds
         )
 
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
