@@ -24,8 +24,7 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/health/**").permitAll()
-                    .requestMatchers("/keep-alive/**").permitAll()
+                    .requestMatchers("/", "/health/**", "/keep-alive/**").permitAll()
                     .anyRequest().permitAll()
             }
             .addFilterBefore(ApiKeyAuthenticationFilter(apiKey, isDevelopment), UsernamePasswordAuthenticationFilter::class.java)
