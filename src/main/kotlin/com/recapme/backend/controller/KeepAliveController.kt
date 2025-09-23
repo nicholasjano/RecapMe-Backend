@@ -1,6 +1,7 @@
 package com.recapme.backend.controller
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,6 +18,12 @@ class KeepAliveController {
         val x = System.currentTimeMillis() % 100
         val y = (1..x.toInt()).sum()
         logger.info("Keep-alive check: computed value {}", y)
-        return ResponseEntity.ok("OK")
+
+        val headers = HttpHeaders()
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate")
+        headers.add("Pragma", "no-cache")
+        headers.add("Expires", "0")
+
+        return ResponseEntity.ok().headers(headers).body("OK")
     }
 }
