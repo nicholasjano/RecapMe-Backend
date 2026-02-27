@@ -2,7 +2,7 @@ services:
   - type: web
     name: recapme-backend
     runtime: docker
-    plan: free
+    plan: starter
     region: singapore
     branch: main
     repo: https://github.com/nicholasjano/RecapMe-Backend
@@ -26,10 +26,6 @@ services:
 
       # API Security Configuration
       - key: API_KEY
-        sync: false
-
-      # CORS Configuration
-      - key: CORS_ALLOWED_ORIGINS
         sync: false
 
       # Redis Configuration

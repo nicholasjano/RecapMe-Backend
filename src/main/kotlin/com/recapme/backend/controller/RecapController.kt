@@ -21,13 +21,9 @@ class RecapController(
 
     @PostMapping
     suspend fun generateRecap(@Valid @RequestBody request: RecapRequest): ResponseEntity<RecapResponse> {
-        logger.info("Received recap request with style: {}", request.style)
-
         // Sanitize and validate inputs
         val sanitizedConversation = inputSanitizationService.sanitizeConversationInput(request.conversation)
         val validatedStyle = inputSanitizationService.validateStyle(request.style)
-
-        logger.debug("Input validation completed successfully")
 
         return try {
             val geminiResponseFuture = geminiService.generateRecap(
@@ -43,7 +39,6 @@ class RecapController(
                 participants = geminiResponse.participants,
                 recap = geminiResponse.recap
             )
-            logger.info("Successfully generated recap with title: {}", geminiResponse.title)
             ResponseEntity.ok(response)
         } catch (e: Exception) {
             logger.error("Failed to generate recap: {}", e.message, e)

@@ -9,6 +9,5 @@ docker run -p 8080:8080 \
   -e DEVELOPMENT="$DEVELOPMENT" \
   -e API_KEY="$API_KEY" \
   -e REDIS_URL="$REDIS_URL" \
-  -e CORS_ALLOWED_ORIGINS="$CORS_ALLOWED_ORIGINS" \
   --name recapme-backend \
   recapme-backend

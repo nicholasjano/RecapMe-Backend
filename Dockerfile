@@ -1,7 +1,7 @@
 # Multi-stage build for Spring Boot Kotlin application
 
 # Build stage
-FROM gradle:8-jdk17 AS build
+FROM gradle:8-jdk21 AS build
 
 # Set working directory
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY src/ src/
 RUN ./gradlew clean build -x test --no-daemon
 
 # Runtime stage
-FROM eclipse-temurin:17-jre AS runtime
+FROM eclipse-temurin:21-jre AS runtime
 
 # Install necessary packages
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*

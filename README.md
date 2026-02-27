@@ -23,7 +23,6 @@ RecapMe Backend is a robust Spring Boot API service that powers the AI-driven ch
 ### Security & Reliability
 - **API Key Authentication**: Secure API access with header-based authentication
 - **Input Sanitization**: Comprehensive validation and sanitization to prevent injection attacks
-- **CORS Configuration**: Flexible cross-origin resource sharing setup
 - **Health Monitoring**: Built-in health check endpoints for service monitoring
 - **Prompt Injection Protection**: Advanced pattern detection to prevent AI manipulation
 
@@ -57,7 +56,7 @@ src/main/kotlin/com/recapme/backend/
 │   ├── GeminiConfig.kt       # Gemini AI client setup
 │   ├── RedisConfig.kt        # Redis configuration
 │   ├── SecurityConfig.kt     # Security and authentication
-│   └── WebConfig.kt          # CORS and web configuration
+│   └── WebConfig.kt          # Web configuration
 ├── controller/
 │   ├── HealthController.kt   # Health check endpoints
 │   ├── KeepAliveController.kt # Keep-alive endpoint
@@ -113,10 +112,7 @@ src/main/kotlin/com/recapme/backend/
    
    # Redis Configuration (OPTIONAL - for rate limiting)
    REDIS_URL=redis://default:password@redis-host:6379
-   
-   # CORS Configuration
-   CORS_ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
-   
+
    # Development Mode
    DEVELOPMENT=false
    ```
@@ -176,7 +172,6 @@ src/main/kotlin/com/recapme/backend/
          - GEMINI_API_KEY=${GEMINI_API_KEY}
          - API_KEY=${API_KEY}
          - REDIS_URL=${REDIS_URL}
-         - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
    ```
 
 ### Release Build
@@ -246,6 +241,9 @@ Returns service health status.
 **GET** `/keep-alive`
 
 Prevents service from sleeping on platforms with auto-sleep.
+
+**Headers:**
+- `X-API-Key: {your-api-key}` (required in production)
 
 **Response:** `200 OK` with body `"OK"`
 
@@ -377,7 +375,6 @@ docker push your-registry/recapme-backend:latest
 
 #### Security
 - Always use strong, unique API keys in production
-- Configure CORS origins to match your frontend domains only
 - Enable Redis for rate limiting in production
 - Use HTTPS/TLS for all production deployments
 - Rotate API keys periodically
@@ -427,11 +424,6 @@ docker push your-registry/recapme-backend:latest
 - Ensure Redis URL is correctly configured
 - Check Redis connection and authentication
 - Verify Redis server is accessible from application
-
-**CORS Errors**
-- Add frontend domain to `CORS_ALLOWED_ORIGINS`
-- Ensure origins include protocol (https://)
-- Check for trailing slashes in origin URLs
 
 **Authentication Failures**
 - Verify `X-API-Key` header is included in requests

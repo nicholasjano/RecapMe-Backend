@@ -38,7 +38,7 @@ class ApiKeyAuthenticationFilter(
         val providedApiKey = request.getHeader(API_KEY_HEADER)
 
         // Check if this is an API endpoint that requires authentication
-        if (request.requestURI.startsWith("/api/")) {
+        if (request.requestURI.startsWith("/api/") || request.requestURI.startsWith("/keep-alive")) {
             if (providedApiKey == null) {
                 response.status = HttpStatus.UNAUTHORIZED.value()
                 response.writer.write("{\"error\":\"Missing X-API-Key header\"}")

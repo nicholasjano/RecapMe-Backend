@@ -1,17 +1,17 @@
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.5.5"
+	id("org.springframework.boot") version "3.5.11"
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "com.recapme"
-version = "0.0.1-SNAPSHOT"
+version = "2.0.0"
 description = "Backend API service for RecapMe app"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -33,13 +33,13 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	// Gemini AI SDK
-	implementation("com.google.genai:google-genai:1.0.0")
+	implementation("com.google.genai:google-genai:1.41.0")
 
 	// Dotenv for loading .env files
-	implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+	implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
 	// Resilience4j for circuit breaker, retry, and timeout
-	implementation("io.github.resilience4j:resilience4j-spring-boot3:2.1.0")
+	implementation("io.github.resilience4j:resilience4j-spring-boot3:2.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-aop")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")

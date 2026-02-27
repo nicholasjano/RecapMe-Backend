@@ -1,6 +1,7 @@
 package com.recapme.backend.service
 
 import com.google.genai.Client
+import com.google.genai.errors.ClientException
 import com.google.genai.types.Content
 import com.google.genai.types.GenerateContentConfig
 import com.google.genai.types.Part
@@ -27,8 +28,6 @@ class GeminiService(
     @Retry(name = "gemini")
     @TimeLimiter(name = "gemini")
     fun generateRecap(conversation: String, style: String): CompletableFuture<ConversationRecapResponse> {
-        logger.info("Starting generateRecap request with style: $style")
-
         return CompletableFuture.supplyAsync {
             try {
                 val systemInstruction = createSystemInstruction(style)
@@ -37,8 +36,6 @@ class GeminiService(
                     .responseMimeType("application/json")
                     .responseSchema(conversationRecapSchema)
                     .build()
-
-                logger.info("Making request to Gemini API with model: $model using dynamic system instruction")
 
                 val response = client.models.generateContent(
                     model,
@@ -51,9 +48,10 @@ class GeminiService(
                     throw RuntimeException("No response text from Gemini API")
                 }
 
-                logger.info("Received structured JSON response: $responseText")
-
                 objectMapper.readValue(responseText, ConversationRecapResponse::class.java)
+            } catch (e: ClientException) {
+                logger.error("Failed to generate recap: API error code ${e.code()}", e)
+                throw e
             } catch (e: Exception) {
                 logger.error("Failed to generate recap", e)
                 throw RuntimeException("Failed to generate recap: ${e.message}", e)
@@ -105,11 +103,7 @@ class GeminiService(
     }
 
     fun generateText(prompt: String): String {
-        logger.info("Starting generateText request")
-
         return try {
-            logger.info("Making request to Gemini API with model: $model")
-
             val response = client.models.generateContent(
                 model,
                 prompt,
@@ -117,6 +111,9 @@ class GeminiService(
             )
 
             response.text() ?: ""
+        } catch (e: ClientException) {
+            logger.error("Failed to generate text: API error code ${e.code()}", e)
+            throw e
         } catch (e: Exception) {
             logger.error("Failed to generate text", e)
             throw RuntimeException("Failed to generate text: ${e.message}", e)
